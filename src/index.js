@@ -1,0 +1,185 @@
+import React from "react";
+import ReactDOM from "react-dom";
+
+// import * as cocoSsd from "@tensorflow-models/coco-ssd";
+// import "@tensorflow/tfjs";
+// import "./styles.css";
+
+import * as tf from '@tensorflow/tfjs';
+import {loadGraphModel} from '@tensorflow/tfjs-converter';
+
+import "./styles.css";
+tf.setBackend('webgl');
+
+
+async function load_model() {
+    const model = await loadGraphModel("http://127.0.0.1:8080/model.json");
+    return model;
+  }
+
+let classesDir = {
+    1: {
+        name: 'Raccoon',
+        id: 1,
+    },
+    2: {
+        name: 'Other',
+        id: 2,
+    }
+}
+
+class App extends React.Component {
+  videoRef = React.createRef();
+  canvasRef = React.createRef();
+
+
+  componentDidMount() {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      const webCamPromise = navigator.mediaDevices
+        .getUserMedia({
+          audio: false,
+          video: {
+            facingMode: "user"
+          }
+        })
+        .then(stream => {
+          window.stream = stream;
+          this.videoRef.current.srcObject = stream;
+          return new Promise((resolve, reject) => {
+            this.videoRef.current.onloadedmetadata = () => {
+              resolve();
+            };
+          });
+        });
+
+      const modelPromise = load_model();
+
+      Promise.all([modelPromise, webCamPromise])
+        .then(values => {
+          this.detectFrame(this.videoRef.current, values[0]);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+  }
+
+    detectFrame = (video, model) => {
+        model.executeAsync(this.process_input(video)).then(predictions => {
+        this.renderPredictions(predictions);
+        requestAnimationFrame(() => {
+          this.detectFrame(video, model);
+        });
+      });
+  };
+
+  process_input(video_frame){
+    const tfimg = tf.browser.fromPixels(video_frame).toInt();
+    const expandedimg = tfimg.transpose([0,1,2]).expandDims();
+    //console.log("Expanded image shape: ", expandedimg.shape);
+    return expandedimg;
+  };
+
+  buildDetectedObjects(scores, threshold, imageWidth, imageHeight, boxes, classes, classesDir) {
+    const detectionObjects = []
+    scores[0].forEach((score, i) => {
+      if (score > threshold) {
+        const bbox = [];
+        const minY = boxes[0][i][0] * imageHeight;
+        const minX = boxes[0][i][1] * imageWidth;
+        const maxY = boxes[0][i][2] * imageHeight;
+        const maxX = boxes[0][i][3] * imageWidth;
+        bbox[0] = minX;
+        bbox[1] = minY;
+        bbox[2] = maxX - minX;
+        bbox[3] = maxY - minY;
+
+        detectionObjects.push({
+          class: classes[i],
+          label: classesDir[classes[i]].name,
+          score: score.toFixed(4),
+          bbox: bbox
+        })
+      }
+    })
+    return detectionObjects
+  }
+
+  renderPredictions = predictions => {
+    const ctx = this.canvasRef.current.getContext("2d");
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    // Font options.
+    const font = "16px sans-serif";
+    ctx.font = font;
+    ctx.textBaseline = "top";
+
+    const boxes = predictions[4].arraySync();
+    const scores = predictions[5].arraySync();
+    const classes = predictions[6].dataSync();
+
+    const threshold = 0.7;
+    const imageWidth = 640;
+    const imageHeight = 480;
+
+    const detections = this.buildDetectedObjects(scores, threshold, imageWidth, imageHeight, boxes, classes, classesDir)
+
+
+    detections.forEach(item => {
+      //const pred1 = predictions[0].arraySync();
+
+      const x = item['bbox'][0];
+      const y = item['bbox'][1];
+      const width = item['bbox'][2];
+      const height = item['bbox'][3];
+
+      // Draw the bounding box.
+      ctx.strokeStyle = "#00FFFF";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x, y, width, height);
+
+      // Draw the label background.
+      ctx.fillStyle = "#00FFFF";
+      const textWidth = ctx.measureText(item["label"] + " " + (100*item["score"]).toFixed(2) + "%").width;
+      const textHeight = parseInt(font, 10); // base 10
+      ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
+    });
+
+    detections.forEach(item => {
+      const x = item['bbox'][0];
+      const y = item['bbox'][1];
+
+      // Draw the text last to ensure it's on top.
+      ctx.fillStyle = "#000000";
+      ctx.fillText(item["label"] + " " + (100*item["score"]).toFixed(2) + "%", x, y);
+    });
+  };
+
+  render() {
+    return (
+      <div>
+        <video
+          className="size"
+          autoPlay
+          playsInline
+          muted
+          ref={this.videoRef}
+          width="600"
+          height="500"
+        />
+        <canvas
+          className="size"
+          ref={this.canvasRef}
+          width="600"
+          height="500"
+        />
+      </div>
+    );
+  }
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);
+
+
+//https://hackernoon.com/tensorflow-js-real-time-object-detection-in-10-lines-of-code-baf15dfb95b2
+//http-server -c1 --cors .
