@@ -1,16 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
-// import * as cocoSsd from "@tensorflow-models/coco-ssd";
-// import "@tensorflow/tfjs";
-// import "./styles.css";
-
 import * as tf from '@tensorflow/tfjs';
 import {loadGraphModel} from '@tensorflow/tfjs-converter';
-
 import "./styles.css";
 tf.setBackend('webgl');
 
+const threshold = 0.75;
+const imageWidth = 640;
+const imageHeight = 480;
 
 async function load_model() {
     const model = await loadGraphModel("http://127.0.0.1:8080/model.json");
@@ -19,7 +16,7 @@ async function load_model() {
 
 let classesDir = {
     1: {
-        name: 'Raccoon',
+        name: 'Kangaroo',
         id: 1,
     },
     2: {
@@ -65,18 +62,19 @@ class App extends React.Component {
   }
 
     detectFrame = (video, model) => {
+        tf.engine().startScope();
         model.executeAsync(this.process_input(video)).then(predictions => {
         this.renderPredictions(predictions);
         requestAnimationFrame(() => {
           this.detectFrame(video, model);
         });
+        tf.engine().endScope();
       });
   };
 
   process_input(video_frame){
     const tfimg = tf.browser.fromPixels(video_frame).toInt();
     const expandedimg = tfimg.transpose([0,1,2]).expandDims();
-    //console.log("Expanded image shape: ", expandedimg.shape);
     return expandedimg;
   };
 
@@ -108,25 +106,21 @@ class App extends React.Component {
   renderPredictions = predictions => {
     const ctx = this.canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
     // Font options.
     const font = "16px sans-serif";
     ctx.font = font;
     ctx.textBaseline = "top";
 
+    //Getting predictions
     const boxes = predictions[4].arraySync();
     const scores = predictions[5].arraySync();
     const classes = predictions[6].dataSync();
 
-    const threshold = 0.7;
-    const imageWidth = 640;
-    const imageHeight = 480;
-
-    const detections = this.buildDetectedObjects(scores, threshold, imageWidth, imageHeight, boxes, classes, classesDir)
-
+    const detections = this.buildDetectedObjects(scores, threshold, imageWidth,
+                                    imageHeight, boxes, classes, classesDir);
 
     detections.forEach(item => {
-      //const pred1 = predictions[0].arraySync();
-
       const x = item['bbox'][0];
       const y = item['bbox'][1];
       const width = item['bbox'][2];
@@ -139,7 +133,7 @@ class App extends React.Component {
 
       // Draw the label background.
       ctx.fillStyle = "#00FFFF";
-      const textWidth = ctx.measureText(item["label"] + " " + (100*item["score"]).toFixed(2) + "%").width;
+      const textWidth = ctx.measureText(item["label"] + " " + (100 * item["score"]).toFixed(2) + "%").width;
       const textHeight = parseInt(font, 10); // base 10
       ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
     });
@@ -157,6 +151,8 @@ class App extends React.Component {
   render() {
     return (
       <div>
+        <h1>Real-Time Object Detection: Kangaroo</h1>
+        <h3>MobileNetV2</h3>
         <video
           className="size"
           autoPlay
@@ -179,7 +175,3 @@ class App extends React.Component {
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(<App />, rootElement);
-
-
-//https://hackernoon.com/tensorflow-js-real-time-object-detection-in-10-lines-of-code-baf15dfb95b2
-//http-server -c1 --cors .
