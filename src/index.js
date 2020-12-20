@@ -10,7 +10,9 @@ const imageWidth = 640;
 const imageHeight = 480;
 
 async function load_model() {
-    const model = await loadGraphModel("http://127.0.0.1:8080/model.json");
+    // It's possible to load the model locally or from a repo
+    //const model = await loadGraphModel("http://127.0.0.1:8080/model.json");
+    const model = await loadGraphModel("https://raw.githubusercontent.com/hugozanini/TFJS-object-detection/master/models/7500-96/model.json");
     return model;
   }
 
