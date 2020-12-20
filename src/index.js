@@ -154,6 +154,7 @@ class App extends React.Component {
         <h1>Real-Time Object Detection: Kangaroo</h1>
         <h3>MobileNetV2</h3>
         <video
+          style={{height: '600px', width: "500px"}}
           className="size"
           autoPlay
           playsInline
@@ -165,7 +166,7 @@ class App extends React.Component {
         <canvas
           className="size"
           ref={this.canvasRef}
-          width="600"
+          width="960"
           height="500"
         />
       </div>
