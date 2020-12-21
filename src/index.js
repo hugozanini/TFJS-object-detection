@@ -93,8 +93,6 @@ class App extends React.Component {
         bbox[1] = minY;
         bbox[2] = maxX - minX;
         bbox[3] = maxY - minY;
-
-
         detectionObjects.push({
           class: classes[i],
           label: classesDir[classes[i]].name,
@@ -149,7 +147,6 @@ class App extends React.Component {
       ctx.fillText(item["label"] + " " + (100*item["score"]).toFixed(2) + "%", x, y);
     });
   };
-
 
   render() {
     return (
