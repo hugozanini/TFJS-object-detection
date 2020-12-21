@@ -6,8 +6,9 @@ import "./styles.css";
 tf.setBackend('webgl');
 
 const threshold = 0.75;
-const imageWidth = 640;
-const imageHeight = 480;
+var rect;
+// var videoWidth;
+// var videoHeight;
 
 async function load_model() {
     // It's possible to load the model locally or from a repo
@@ -64,9 +65,12 @@ class App extends React.Component {
   }
 
     detectFrame = (video, model) => {
+        // videoWidth = video.width;
+        // videoHeight = video.height;
+
         tf.engine().startScope();
         model.executeAsync(this.process_input(video)).then(predictions => {
-        this.renderPredictions(predictions);
+        this.renderPredictions(predictions, video);
         requestAnimationFrame(() => {
           this.detectFrame(video, model);
         });
@@ -80,19 +84,26 @@ class App extends React.Component {
     return expandedimg;
   };
 
-  buildDetectedObjects(scores, threshold, imageWidth, imageHeight, boxes, classes, classesDir) {
+  buildDetectedObjects(scores, threshold, boxes, classes, classesDir) {
     const detectionObjects = []
+    var video_frame = document.getElementById('frame');
+
+    rect = video_frame.getBoundingClientRect();
+
+    console.log("video_frame width: ", video_frame.offsetWidth);
+    console.log("video_frame height: ", video_frame.offsetHeight);
     scores[0].forEach((score, i) => {
       if (score > threshold) {
         const bbox = [];
-        const minY = boxes[0][i][0] * imageHeight;
-        const minX = boxes[0][i][1] * imageWidth;
-        const maxY = boxes[0][i][2] * imageHeight;
-        const maxX = boxes[0][i][3] * imageWidth;
+        const minY = boxes[0][i][0] * video_frame.offsetHeight;
+        const minX = boxes[0][i][1] * video_frame.offsetWidth;
+        const maxY = boxes[0][i][2] * video_frame.offsetHeight;
+        const maxX = boxes[0][i][3] * video_frame.offsetWidth;
         bbox[0] = minX;
         bbox[1] = minY;
-        bbox[2] = maxX - minX;
+        bbox[2] = maxX - minX; //*1.5;
         bbox[3] = maxY - minY;
+
 
         detectionObjects.push({
           class: classes[i],
@@ -106,6 +117,7 @@ class App extends React.Component {
   }
 
   renderPredictions = predictions => {
+    //console.log("predictions: ", predictions);
     const ctx = this.canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -118,9 +130,8 @@ class App extends React.Component {
     const boxes = predictions[4].arraySync();
     const scores = predictions[5].arraySync();
     const classes = predictions[6].dataSync();
-
-    const detections = this.buildDetectedObjects(scores, threshold, imageWidth,
-                                    imageHeight, boxes, classes, classesDir);
+    const detections = this.buildDetectedObjects(scores, threshold,
+                                    boxes, classes, classesDir);
 
     detections.forEach(item => {
       const x = item['bbox'][0];
@@ -150,6 +161,7 @@ class App extends React.Component {
     });
   };
 
+
   render() {
     return (
       <div>
@@ -164,11 +176,12 @@ class App extends React.Component {
           ref={this.videoRef}
           width="600"
           height="500"
+          id="frame"
         />
         <canvas
           className="size"
           ref={this.canvasRef}
-          width="960"
+          width="600"
           height="500"
         />
       </div>
