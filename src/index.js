@@ -6,9 +6,6 @@ import "./styles.css";
 tf.setBackend('webgl');
 
 const threshold = 0.75;
-var rect;
-// var videoWidth;
-// var videoHeight;
 
 async function load_model() {
     // It's possible to load the model locally or from a repo
@@ -65,9 +62,6 @@ class App extends React.Component {
   }
 
     detectFrame = (video, model) => {
-        // videoWidth = video.width;
-        // videoHeight = video.height;
-
         tf.engine().startScope();
         model.executeAsync(this.process_input(video)).then(predictions => {
         this.renderPredictions(predictions, video);
@@ -88,10 +82,6 @@ class App extends React.Component {
     const detectionObjects = []
     var video_frame = document.getElementById('frame');
 
-    rect = video_frame.getBoundingClientRect();
-
-    console.log("video_frame width: ", video_frame.offsetWidth);
-    console.log("video_frame height: ", video_frame.offsetHeight);
     scores[0].forEach((score, i) => {
       if (score > threshold) {
         const bbox = [];
@@ -101,7 +91,7 @@ class App extends React.Component {
         const maxX = boxes[0][i][3] * video_frame.offsetWidth;
         bbox[0] = minX;
         bbox[1] = minY;
-        bbox[2] = maxX - minX; //*1.5;
+        bbox[2] = maxX - minX;
         bbox[3] = maxY - minY;
 
 
@@ -117,7 +107,6 @@ class App extends React.Component {
   }
 
   renderPredictions = predictions => {
-    //console.log("predictions: ", predictions);
     const ctx = this.canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
