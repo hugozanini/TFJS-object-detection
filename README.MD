@@ -25,7 +25,7 @@ src="https://www.netgovern.com/sites/default/files/styles/large/public/Try-it-Li
 The model saved at `models/kangaroo-detector` was trained using the kangaroo-dataset available on kaggle:
 
 
-![kangaroo-dataset home](./git_media/dataset.png =660x)
+![kangaroo-dataset home](./git_media/dataset.png)
 
 You can train your own model, upload it in the `model` folder and load as well.
 
@@ -94,7 +94,7 @@ npm start
 
 The application is going to run at `[http://localhost:3000](http://localhost:3000)` and you should see something similar to this:
 
-![App home page](./git_media/homepage.png =660x)
+![App home page](./git_media/homepage.png)
 
 The model takes from 1 to 2 seconds to load and, after that, you can show the objects images to the camera and the application is going to draw bounding boxes around them.
 
