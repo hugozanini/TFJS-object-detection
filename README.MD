@@ -22,10 +22,16 @@ src="https://www.netgovern.com/sites/default/files/styles/large/public/Try-it-Li
 
 ## Getting started
 
-The model saved at `models/kangaroo-detector` was trained using the kangaroo-dataset available on kaggle:
+The model saved at `models/kangaroo-detector` was trained using the [kangaroo-dataset](https://www.kaggle.com/hugozanini1/kangaroodataset) available on kaggle:
+
+<body> <a  href="https://www.kaggle.com/hugozanini1/kangaroodataset">
+<img  alt="Qries"
+src="./git_media/dataset.png">
+</a>
+</body
+<br>
 
 
-![kangaroo-dataset home](./git_media/dataset.png)
 
 You can train your own model, upload it in the `model` folder and load as well.
 
