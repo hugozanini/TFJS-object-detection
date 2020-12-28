@@ -1,21 +1,21 @@
 # Real-time object detection in the browser using TensorFlow.js
 
-This repository is part of the tutorial [Custom real-time object detection in the browser using TensorFlow.js](https://medium.com/@zaninihugo/custom-real-time-object-detection-in-the-browser-using-tensorflow-js-5ca90538eace). To a better understanding of how the object detection model was built, refer to the tutorial post.
+This repository is part of the tutorial [Custom real-time object detection in the browser using TensorFlow.js](https://medium.com/@zaninihugo/custom-real-time-object-detection-in-the-browser-using-tensorflow-js-5ca90538eace). For a better understanding of how the object detection model was built, refer to the tutorial post.
 
 
-This project is a simple web-app that loads a model in the TensorFlow.js layers format using javascript and perform real-time inferences ingesting videos from a PC or mobile camera.
+This project is a simple web-app that loads a model in the TensorFlow.js layers format using javascript and performs real-time inferences ingesting videos from a PC or mobile camera.
 
-A Kangaroo detector was trained as a demo, but any object can be recognized following the [tutorial steps](https://medium.com/@zaninihugo/custom-real-time-object-detection-in-the-browser-using-tensorflow-js-5ca90538eace) and will produce results similar as the shown below:
+A Kangaroo detector was trained as a demo, but any object can be recognized following the [tutorial steps](https://medium.com/@zaninihugo/custom-real-time-object-detection-in-the-browser-using-tensorflow-js-5ca90538eace) and it will produce results similar to the shown below:
 
 ![Object detection demo](./git_media/kangaroo-demo.gif)
 <br>
 
 
 
-<body> A live demo is available on Glitch:<br>  <a  href="https://palm-boiling-kilogram.glitch.me">  
-<img  alt="Qries"  
-src="https://www.netgovern.com/sites/default/files/styles/large/public/Try-it-Live-2.png?itok=JcCNIc7d"  width=200" height="145">  
-</a>  
+<body> A live demo is available on Glitch:<br>  <a  href="https://palm-boiling-kilogram.glitch.me">
+<img  alt="Qries"
+src="https://www.netgovern.com/sites/default/files/styles/large/public/Try-it-Live-2.png?itok=JcCNIc7d"  width=200" height="145">
+</a>
 </body
 <br>
 
@@ -25,7 +25,7 @@ src="https://www.netgovern.com/sites/default/files/styles/large/public/Try-it-Li
 The model saved at `models/kangaroo-detector` was trained using the kangaroo-dataset available on kaggle:
 
 
-![kangaroo-dataset home](./git_media/dataset.png)
+![kangaroo-dataset home](./git_media/dataset.png =660x)
 
 You can train your own model, upload it in the `model` folder and load as well.
 
@@ -67,7 +67,7 @@ Go to `models > kangaroo-detector` and run the command below to make the model a
 http-server -c1 --cors .
 ```
 The second option is to upload the model files somewhere, in my case, I chose my own Github repo and referenced to the `model.json` URL in the `load_model` function:
-
+homepage.png
 ```js
 async function load_model() {
 	// It's possible to load the model locally or from a repo
@@ -94,7 +94,7 @@ npm start
 
 The application is going to run at `[http://localhost:3000](http://localhost:3000)` and you should see something similar to this:
 
-![App home page](./git_media/homepage.png)
+![App home page](./git_media/homepage.png =660x)
 
 The model takes from 1 to 2 seconds to load and, after that, you can show the objects images to the camera and the application is going to draw bounding boxes around them.
 
