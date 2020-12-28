@@ -12,7 +12,7 @@ A Kangaroo detector was trained as a demo, but any object can be recognized foll
 
 
 
-<body> A live demo is available on Glitch:<br>  <a  href="https://palm-boiling-kilogram.glitch.me">
+<body> A live demo is available on Glitch:<br>  <a  href="https://glitch.com/edit/#!/palm-boiling-kilogram">
 <img  alt="Qries"
 src="https://www.netgovern.com/sites/default/files/styles/large/public/Try-it-Live-2.png?itok=JcCNIc7d"  width=200" height="145">
 </a>
