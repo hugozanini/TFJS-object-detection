@@ -5,8 +5,8 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
-    "@tensorflow-models/coco-ssd": "0.1.1",
     "@tensorflow/tfjs": "^1.7.4",
+    "@tensorflow/tfjs-converter": "^1.7.4",
     "react": "16.5.2",
     "react-dom": "16.5.2",
     "react-magic-dropzone": "1.0.1",
