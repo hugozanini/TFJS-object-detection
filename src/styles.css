@@ -3,3 +3,13 @@
     top: 0;
     left: 0;
   }
+
+  .text-container {
+      margin-top: 400px;
+      position: absolute;
+  }
+
+  .init-text-container {
+      margin-top: 380px;
+      position: absolute;
+  }

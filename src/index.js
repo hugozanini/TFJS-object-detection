@@ -11,7 +11,11 @@ async function load_model() {
     // It's possible to load the model locally or from a repo
     // You can choose whatever IP and PORT you want in the "http://127.0.0.1:8080/model.json" just set it before in your https server
     //const model = await loadGraphModel("http://127.0.0.1:8080/model.json");
+    const start = Date.now();
     const model = await loadGraphModel("https://raw.githubusercontent.com/hugozanini/TFJS-object-detection/master/models/kangaroo-detector/model.json");
+    const latency = Date.now() - start;
+    const loadingPerformance = document.querySelector('.init-text-container');
+    loadingPerformance.textContent = `Loading latency: ${latency}ms`;
     return model;
   }
 
@@ -63,6 +67,7 @@ class App extends React.Component {
   }
 
     detectFrame = (video, model) => {
+        const start = Date.now();
         tf.engine().startScope();
         model.executeAsync(this.process_input(video)).then(predictions => {
         this.renderPredictions(predictions, video);
@@ -71,6 +76,9 @@ class App extends React.Component {
         });
         tf.engine().endScope();
       });
+        const latency = Date.now() - start;
+        const performanceResult = document.querySelector('.text-container');
+        performanceResult.textContent = `Inference latency: ${latency}ms`;
   };
 
   process_input(video_frame){
